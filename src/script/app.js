@@ -68,7 +68,7 @@ const responseeditor = CodeMirror.fromTextArea(
 );
 
 const headerseditor = CodeMirror.fromTextArea(
-  document.getElementById("headerseditor"), 
+  document.getElementById("headerseditor"),
   {
     mode: "application/json",
     lineNumbers: true,
@@ -97,9 +97,10 @@ setTimeout(() => {
 send.addEventListener("click", async () => {
   switch (opt.value) {
     case "GET":
+      headersname.push({ "Access-Control-Allow-Origin": true });
       let resp = await axios
         .get(sendform.value, {
-          headers: { "Access-Control-Allow-Origin": "*" },
+          headers: { "Access-Control-Allow-Origin": true },
         })
         .then((resp) => {
           return resp;
@@ -110,6 +111,7 @@ send.addEventListener("click", async () => {
       updateResponse(resp);
 
       headerseditor.setValue(JSON.stringify(resp.headers, undefined, 2));
+      headersname = [];
       break;
     case "POST":
       for (let i = 0; i < headercount; i++) {
@@ -137,24 +139,74 @@ send.addEventListener("click", async () => {
       responseeditor.setValue(JSON.stringify(response.data, undefined, 2));
       console.log(response);
 
-      headersIncome.style.display = 'block';
+      headersIncome.style.display = "block";
 
       console.log(response.headers);
       headerseditor.setValue(JSON.stringify(response.headers, undefined, 2));
-
-      console.log(headersname);
-
       headersname = [];
-
-      console.log(headersname);
-      
       break;
     case "PUT":
-      console.log("put");
+      for (let i = 0; i < headercount; i++) {
+        let key = document.getElementById(`parameterKey${i + 1}`);
+        let val = document.getElementById(`parameterValue${i + 1}`);
+
+        const obj = {
+          key: key.value,
+          value: val.value,
+        };
+
+        headersname.push(obj);
+      }
+
+      let responseput = await axios
+        .post(
+          `${sendform.value}`,
+          JSON.parse(editor.getValue(), {
+            headers: headersname,
+          })
+        )
+        .then((response) => {
+          return response;
+        });
+      responseeditor.setValue(JSON.stringify(responseput.data, undefined, 2));
+      console.log(responseput);
+
+      headersIncome.style.display = "block";
+
+      console.log(responseput.headers);
+      headerseditor.setValue(JSON.stringify(responseput.headers, undefined, 2));
+      headersname = [];
       break;
     case "DELETE":
-      console.log("delete");
+      for (let i = 0; i < headercount; i++) {
+        let key = document.getElementById(`parameterKey${i + 1}`);
+        let val = document.getElementById(`parameterValue${i + 1}`);
+
+        const obj = {
+          key: key.value,
+          value: val.value,
+        };
+
+        headersname.push(obj);
+      }
       break;
+
+      const responsedelete = await axios
+        .delete(sendform.value, {
+          headers: headersname,
+        })
+        .then((response) => {
+          return response;
+        });
+
+      console.log(responsedelete);
+      responseeditor.setValue(
+        JSON.stringify(responsedelete.data, undefined, 2)
+      );
+      headersIncome.style.display = "block";
+      headerseditor.setValue(
+        JSON.stringify(responsedelete.headers, undefined, 2)
+      );
 
     default:
       console.log("nothing");
