@@ -16,4 +16,4 @@ API development tool used for testing and development of an API - Mac OS version
 
 Download our rest api client from https://perfactors.com/commuter.
 
-### Enjoy your powerfull application.
+### Enjoy your powerfull Application.
